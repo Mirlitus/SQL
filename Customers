@@ -1,0 +1,28 @@
+SELECT 
+  c.`CustomerName` AS 'Customer Name', 
+  o.`OrderID` AS 'Order ID', 
+  o.`OrderDate` AS 'Order Date', 
+  p.`ProductName` AS 'Product Name', 
+  od.`Quantity` AS 'Quantity', 
+  p.`UnitPrice` AS 'Unit Price', 
+  (od.`Quantity` * p.`UnitPrice`) AS 'Total',
+  (SELECT AVG(`UnitPrice`) FROM `products`) AS 'Average Unit Price'
+FROM 
+  `customers` c
+  JOIN `orders` o ON c.`CustomerID` = o.`CustomerID`
+  JOIN `order_details` od ON o.`OrderID` = od.`OrderID`
+  JOIN `products` p ON od.`ProductID` = p.`ProductID`
+WHERE 
+  o.`OrderDate` BETWEEN '1997-01-01' AND '1997-12-31' 
+  AND p.`CategoryID` = 2
+GROUP BY 
+  c.`CustomerName`, 
+  o.`OrderID`, 
+  o.`OrderDate`, 
+  p.`ProductName`, 
+  od.`Quantity`, 
+  p.`UnitPrice`
+HAVING 
+  (od.`Quantity` * p.`UnitPrice`) > (SELECT AVG(`UnitPrice`) FROM `products`) * 25
+ORDER BY 
+  'Total' DESC;
