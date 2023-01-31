@@ -1,0 +1,51 @@
+WITH 
+  sales_data AS (
+    SELECT 
+      `Region`, 
+      `Country`, 
+      `Item_Type`, 
+      `Sales_Channel`, 
+      SUM(`Total_Revenue`) AS `Revenue`, 
+      AVG(`Unit_Price`) AS `Average_Price`, 
+      SUM(`Total_Cost`) AS `Cost`, 
+      SUM(`Total_Profit`) AS `Profit`
+    FROM 
+      `sales`
+    GROUP BY 
+      `Region`, 
+      `Country`, 
+      `Item_Type`, 
+      `Sales_Channel`
+  ),
+  avg_sales_data AS (
+    SELECT 
+      AVG(`Revenue`) AS `Avg_Revenue`, 
+      AVG(`Average_Price`) AS `Avg_Average_Price`, 
+      AVG(`Cost`) AS `Avg_Cost`, 
+      AVG(`Profit`) AS `Avg_Profit`
+    FROM 
+      sales_data
+  )
+SELECT 
+  `Region`, 
+  `Country`, 
+  `Item_Type`, 
+  `Sales_Channel`, 
+  `Revenue`, 
+  `Average_Price`, 
+  `Cost`, 
+  `Profit`, 
+  (`Revenue` - `Avg_Revenue`) / `Avg_Revenue` * 100 AS `Revenue_Variation`,
+  (`Average_Price` - `Avg_Average_Price`) / `Avg_Average_Price` * 100 AS `Average_Price_Variation`,
+  (`Cost` - `Avg_Cost`) / `Avg_Cost` * 100 AS `Cost_Variation`,
+  (`Profit` - `Avg_Profit`) / `Avg_Profit` * 100 AS `Profit_Variation`
+FROM 
+  sales_data
+  JOIN avg_sales_data 
+WHERE 
+  `Revenue` > `Avg_Revenue` 
+  AND `Average_Price` < `Avg_Average_Price`
+  AND `Profit` > `Avg_Profit`
+ORDER BY 
+  `Revenue_Variation` DESC, 
+  `Profit_Variation` DESC;
