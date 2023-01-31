@@ -1,0 +1,47 @@
+WITH 
+  flight_data AS (
+    SELECT 
+      `flight_number`, 
+      `departure_airport`, 
+      `arrival_airport`, 
+      `departure_date`, 
+      `arrival_date`, 
+      `flight_time`,
+      ROUND(`flight_time` / 60) AS `flight_time_hours`
+    FROM 
+      `flights`
+  ),
+  airport_data AS (
+    SELECT 
+      `airport_code`, 
+      `airport_name`, 
+      `city`, 
+      `country`, 
+      `timezone`
+    FROM 
+      `airports`
+  )
+SELECT 
+  `flight_number`, 
+  `departure_airport`, 
+  `departure_data`.`airport_name` AS `Departure_Airport_Name`,
+  `departure_data`.`city` AS `Departure_City`,
+  `departure_data`.`country` AS `Departure_Country`,
+  `departure_data`.`timezone` AS `Departure_Timezone`,
+  `arrival_airport`, 
+  `arrival_data`.`airport_name` AS `Arrival_Airport_Name`,
+  `arrival_data`.`city` AS `Arrival_City`,
+  `arrival_data`.`country` AS `Arrival_Country`,
+  `arrival_data`.`timezone` AS `Arrival_Timezone`,
+  `departure_date`, 
+  `arrival_date`, 
+  `flight_time`, 
+  `flight_time_hours`
+FROM 
+  flight_data
+  LEFT JOIN airport_data AS `departure_data`
+    ON `flight_data`.`departure_airport` = `departure_data`.`airport_code`
+  LEFT JOIN airport_data AS `arrival_data`
+    ON `flight_data`.`arrival_airport` = `arrival_data`.`airport_code`
+ORDER BY 
+  `flight_number`;
